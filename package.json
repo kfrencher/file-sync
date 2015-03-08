@@ -1,0 +1,9 @@
+{
+  "name": "file-sync",
+  "title": "file-sync",
+  "id": "jid1-IbkUI76UHhU6HA",
+  "description": "Synchronizes content in a webpage with a file on the file system",
+  "author": "",
+  "license": "MPL 2.0",
+  "version": "0.1"
+}

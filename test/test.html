@@ -1,0 +1,41 @@
+<html>
+<head>
+<script>
+    var createInput, destroyInput;
+
+    document.addEventListener('DOMContentLoaded', function(){
+        var input = document.querySelector('#inputName');
+        var inputContainer = document.querySelector('#inputContainer');
+        var observer = new MutationObserver(function(mutations){
+            console.log(mutations.map(function(mutation) mutation.type));
+        });
+        observer.observe(input,{attributes:true, characterData: true});
+
+        createInput = function(e){
+            var newInput = document.createElement('input');
+            newInput.name = input.value;
+            newInput.value = input.value;
+            newInput.addEventListener('change',function(e){
+                console.log('New value is: ' + this.value);
+            });
+            inputContainer.appendChild(newInput);
+        }
+        destroyInput = function(){
+            var targetInputs = Array.from(document.querySelectorAll('input[name='+input.value+']') || []);
+            console.log('Destroying: ' + targetInputs.map(function(input) input.name).join(','));
+            targetInputs.forEach(inputContainer.removeChild.bind(inputContainer));        
+        }
+
+        var textarea = document.querySelector('textarea');
+        textarea.addEventListener('change', function(){
+            console.log('The value of the textarea is: ' + this.value.replace('\n',' '));
+        });
+    });
+</script>
+</head>
+<input id="inputName" type="text" value="test" />
+<input type="button" value="Create" onclick="createInput(event)" />
+<input type="button" value="Destroy" onclick="destroyInput(event)" />
+<div id="inputContainer"></div>
+<textarea>This is a a test</textarea>
+</html>
