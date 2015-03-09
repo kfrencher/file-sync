@@ -12,12 +12,21 @@ var calculateFileName = function(input) {
 
 }
 
+var targetInput;
+self.port.on('syncfile', function(content){
+    if(targetInput){
+        console.log('Syncing file to input');
+        targetInput.value = content;
+    }
+});
+
 // Sends message to main to sync the data with file
 var emitValue = function(e) {
-    console.log('emitting sync event');
-    self.port.emit('sync', {
-        fileName: calculateFileName(e.target),
-        content: this.value
+    console.log('emitting syncbrowser event');
+    targetInput = e.target;
+    self.port.emit('syncbrowser', {
+        fileName: calculateFileName(targetInput),
+        content: targetInput.value
     });
 }
 
@@ -35,13 +44,7 @@ var getTextInputs = function(doc) {
     }
 };
 
-/**
- * Create an observer that will listen to changes in the body and
- * search for all inputs on the page. The inputs will then be observed
- * for changes
- */
-var observer = new MutationObserver(function() {
-
+var watchInputs = function() {
     var textInputsInMainWindow = getTextInputs(document),
         iframes = Array.from(document.querySelectorAll('iframe')),
         textInputsInIframes = flatten(iframes.map(iframe => iframe.contentDocument)
@@ -50,13 +53,22 @@ var observer = new MutationObserver(function() {
 
 
     inputs.forEach(function(input) {
-        console.log('Attaching listener to: ' + input.tagName + '[name=' + input.name + ']');
+        console.log('Attaching listener to: ' + input.tagName + '[id=' + input.id + ', name=' + input.name + ']');
         input.addEventListener('change', emitValue);
         input.addEventListener('mousedown', emitValue);
     });
-});
+}
 
-observer.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+if(document.body){
+    /**
+     * Create an observer that will listen to changes in the body and
+     * search for all inputs on the page. The inputs will then be observed
+     * for changes
+     */
+    var observer = new MutationObserver(watchInputs);
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    watchInputs();
+}
