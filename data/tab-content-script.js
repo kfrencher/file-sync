@@ -1,3 +1,9 @@
+if(!Array.from){
+    Array.from = function(xs){
+        return Array.prototype.slice.call(xs);
+    }
+}
+
 /**
  * Flattens the provided collection of arrays into a single array
  */
@@ -7,10 +13,6 @@ var flatten = function(xss) {
     }, []);
 };
 
-var calculateFileName = function(input) {
-    return 'scratch.txt';
-
-}
 
 var targetInput;
 self.port.on('syncfile', function(content){
@@ -24,10 +26,7 @@ self.port.on('syncfile', function(content){
 var emitValue = function(e) {
     console.log('emitting syncbrowser event');
     targetInput = e.target;
-    self.port.emit('syncbrowser', {
-        fileName: calculateFileName(targetInput),
-        content: targetInput.value
-    });
+    self.port.emit('syncbrowser', targetInput.value);
 }
 
 // Returns all text and textarea inputs in the passed in document
