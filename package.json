@@ -15,5 +15,15 @@
         "name": "baseFileName",
         "value": "scratch",
         "type": "string"
+    }, {
+        "title": "pollingInterval",
+        "name": "pollingInterval",
+        "value": 1000,
+        "type": "integer"
+    }, {
+        "title": "syncTargetSelectors",
+        "name": "syncTargetSelectors",
+        "value": "input[type=text],input:not([type]),textarea",
+        "type": "string"
     }]
 }

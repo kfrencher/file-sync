@@ -14,30 +14,26 @@ var flatten = function(xss) {
 };
 
 
-var targetInput;
+var syncTarget; //the current input to use as the sync target
 self.port.on('syncfile', function(content){
-    if(targetInput){
+    if(syncTarget){
         console.log('Syncing file to input');
-        targetInput.value = content;
+        syncTarget.value = content;
     }
 });
 
 // Sends message to main to sync the data with file
 var emitValue = function(e) {
     console.log('emitting syncbrowser event');
-    targetInput = e.target;
-    self.port.emit('syncbrowser', targetInput.value);
+    syncTarget = e.target;
+    self.port.emit('syncbrowser', syncTarget.value);
 }
 
 // Returns all text and textarea inputs in the passed in document
 var getTextInputs = function(doc) {
+    var syncTargetSelectors = self.options.syncTargetSelectors;
     if (doc) {
-        var inputs = [].concat(
-            Array.from(doc.querySelectorAll('input[type=text]')),
-            Array.from(doc.querySelectorAll('input:not([type])')),
-            Array.from(doc.querySelectorAll('textarea'))
-        );
-        return inputs;
+        return flatten(syncTargetSelectors.map(selector => Array.from(doc.querySelectorAll(selector))));
     } else {
         return [];
     }
@@ -49,7 +45,6 @@ var watchInputs = function() {
         textInputsInIframes = flatten(iframes.map(iframe => iframe.contentDocument)
             .map(getTextInputs)),
         inputs = [].concat(textInputsInMainWindow, textInputsInIframes);
-
 
     inputs.forEach(function(input) {
         console.log('Attaching listener to: ' + input.tagName + '[id=' + input.id + ', name=' + input.name + ']');
